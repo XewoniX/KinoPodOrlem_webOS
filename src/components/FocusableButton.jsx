@@ -5,6 +5,13 @@ const FocusableButton = ({ text, onClick, color = '#333333', style, className = 
   const { ref, focused, focusSelf } = useFocusable({
     focusKey,
     onEnterPress: onEnterPress || onClick,
+    onFocus: ({ node }) => {
+      node.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      });
+    }
   });
 
   return (

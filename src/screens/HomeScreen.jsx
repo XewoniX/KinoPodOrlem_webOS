@@ -9,6 +9,13 @@ const ContinueWatchingCard = ({ item, onClick, focusKey }) => {
   const { ref, focused } = useFocusable({
     focusKey,
     onEnterPress: onClick,
+    onFocus: ({ node }) => {
+      node.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      });
+    }
   });
 
   const imgUrl = item.poster ? (item.poster.startsWith('http') ? item.poster : `${SERVER_URL}${item.poster}`) : null;

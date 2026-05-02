@@ -16,6 +16,13 @@ const MovieCard = ({ movie, onClick, focusKey }) => {
   const { ref, focused } = useFocusable({
     focusKey,
     onEnterPress: onClick,
+    onFocus: ({ node }) => {
+      node.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      });
+    }
   });
 
   const imgUrl = getFullImageUrl(movie.img_url || movie.poster);
