@@ -21,9 +21,9 @@
         "sourceUrl": "https://github.com/XewoniX/KinoPodOrlem_webOS",
         "ipkUrl": "https://github.com/XewoniX/KinoPodOrlem_webOS/releases/download/TV-dom/com.xewonix.orlekino_1.0.0_all.ipk",
         "ipkHash": {
-          "sha256": "e46018340c8782f6c583e0a27c0c188875dcba5f09e031de01fdf748bb02a7e8"
+          "sha256": "fcdc8964950710f7da10f5c815e2dc93472573a2ec10b9071952187cf6f41d07"
         },
-        "ipkSize": 668742
+        "ipkSize": 668480
       }
     }
   ]

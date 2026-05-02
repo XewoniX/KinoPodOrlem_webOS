@@ -11,7 +11,6 @@ const VideoPlayerScreen = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(null);
-  const [loadStatus, setLoadStatus] = useState('Inicjalizacja...');
 
   // state: { folder: string, filename: string, startPos: number }
   const folder = state?.folder || '';
@@ -51,6 +50,9 @@ const VideoPlayerScreen = () => {
         case 'Escape':
         case 'Backspace':
         case 'GoBack':
+        case 'Back':
+        case 'XF86Back':
+          e.preventDefault();
           navigate(-1);
           break;
         default:
@@ -71,10 +73,7 @@ const VideoPlayerScreen = () => {
         autoPlay
         playsInline
         style={{ width: '100%', height: '100%' }}
-        onLoadStart={() => setLoadStatus('Ładowanie strumienia...')}
-        onWaiting={() => setLoadStatus('Buforowanie...')}
         onPlaying={() => {
-            setLoadStatus('Odtwarzanie');
             setIsPlaying(true);
             if (startPos > 0 && videoRef.current && videoRef.current.currentTime < 1) {
                 videoRef.current.currentTime = startPos;
@@ -83,16 +82,15 @@ const VideoPlayerScreen = () => {
         onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
         onLoadedMetadata={() => {
             setDuration(videoRef.current?.duration || 0);
-            setLoadStatus('Metadane załadowane');
         }}
         onError={(e) => {
             const videoErr = videoRef.current?.error;
             let msg = 'Nieznany błąd odtwarzacza';
             if (videoErr) {
-                if (videoErr.code === 1) msg = 'Pobieranie przerwane (Aborted)';
-                else if (videoErr.code === 2) msg = 'Błąd sieci (Network Error)';
-                else if (videoErr.code === 3) msg = 'Błąd dekodowania (Decoding Error) - prawdopodobnie brak wsparcia dla kodeka na tym TV.';
-                else if (videoErr.code === 4) msg = 'Format nieobsługiwany (Format not supported)';
+                if (videoErr.code === 1) msg = 'Pobieranie przerwane';
+                else if (videoErr.code === 2) msg = 'Błąd sieci';
+                else if (videoErr.code === 3) msg = 'Błąd dekodowania - brak wsparcia dla kodeka.';
+                else if (videoErr.code === 4) msg = 'Format nieobsługiwany.';
             }
             setError(msg);
         }}
@@ -100,15 +98,6 @@ const VideoPlayerScreen = () => {
           <source src={streamUrl} type="video/mp4" />
           <source src={streamUrl} type="video/x-matroska" />
       </video>
-
-      {/* Debug Info Overlay (Temporary to find the issue) */}
-      <div style={{ 
-          position: 'absolute', top: '20px', left: '20px', 
-          backgroundColor: 'rgba(0,0,0,0.5)', padding: '10px', fontSize: '14px', zIndex: 100 
-      }}>
-          <div>Status: {loadStatus}</div>
-          <div style={{ fontSize: '10px', maxWidth: '80vw', wordBreak: 'break-all' }}>URL: {streamUrl}</div>
-      </div>
 
       {/* Error Overlay */}
       {error && (
