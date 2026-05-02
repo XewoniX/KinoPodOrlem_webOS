@@ -8,7 +8,7 @@ const FocusableButton = ({ text, onClick, color = '#333333', style, className = 
     onFocus: ({ node }) => {
       node.scrollIntoView({
         behavior: 'smooth',
-        block: 'nearest',
+        block: 'center',
         inline: 'nearest'
       });
     }

@@ -12,7 +12,7 @@ const ContinueWatchingCard = ({ item, onClick, focusKey }) => {
     onFocus: ({ node }) => {
       node.scrollIntoView({
         behavior: 'smooth',
-        block: 'nearest',
+        block: 'center',
         inline: 'nearest'
       });
     }
