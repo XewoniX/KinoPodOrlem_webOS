@@ -7,7 +7,7 @@
       "title": "Kino pod Orlem",
       "iconUri": "https://raw.githubusercontent.com/XewoniX/KinoPodOrlem_webOS/main/public/icon.png",
       "manifestUrl": "https://raw.githubusercontent.com/XewoniX/KinoPodOrlem_webOS/main/manifest.json",
-      "location": "https://github.com/XewoniX/KinoPodOrlem_webOS/releases/download/TV-dom/com.xewonix.orlekino_1.0.0_all.ipk",
+      "location": "https://raw.githubusercontent.com/XewoniX/KinoPodOrlem_webOS/main/com.xewonix.orlekino_1.0.0_all.ipk",
       "description": "Aplikacja Kino pod Orlem dla TV LG webOS - Filmy i Seriale",
       "shortDescription": "Kino pod Orlem dla TV",
       "category": "Video"
