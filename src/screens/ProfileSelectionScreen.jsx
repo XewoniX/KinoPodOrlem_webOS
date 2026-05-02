@@ -95,7 +95,7 @@ const ProfileSelectionScreen = ({ onSelect }) => {
         alignItems: 'center',
         height: '100%',
       }}>
-        <img src="/logoithextoackground.png" alt="Logo" style={{ width: '240px', marginBottom: '40px' }} />
+        <img src="./logoithextoackground.png" alt="Logo" style={{ width: '240px', marginBottom: '40px' }} />
         <h1 style={{ fontSize: '48px', color: 'white', marginBottom: '64px' }}>Kto ogląda?</h1>
         
         {loading ? (

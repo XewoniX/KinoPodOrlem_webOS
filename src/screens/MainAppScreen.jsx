@@ -64,7 +64,7 @@ const MainAppScreen = ({ currentUser, onLogout }) => {
           padding: '24px 48px',
           gap: '24px'
         }}>
-          <img src="/logo.png" alt="Logo" style={{ width: '50px', height: '50px' }} />
+          <img src="./logo.png" alt="Logo" style={{ width: '50px', height: '50px' }} />
           
           <TabButton icon={Home} label="GŁÓWNA" isActive={activeTab === 'HOME'} onClick={() => setActiveTab('HOME')} />
           <TabButton icon={Search} label="WYSZUKIWARKA" isActive={activeTab === 'SEARCH'} onClick={() => setActiveTab('SEARCH')} />
