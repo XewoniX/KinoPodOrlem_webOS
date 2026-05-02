@@ -22,7 +22,7 @@ const SearchScreen = ({ currentUser, onMovieSelect }) => {
         query,
         movies: true,
         series: true
-      });
+      }, { timeout: 10000 });
       setResults(res.data.results || []);
     } catch (err) {
       setError('Błąd wyszukiwania');

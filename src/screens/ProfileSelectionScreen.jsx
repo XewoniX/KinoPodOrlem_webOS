@@ -58,7 +58,7 @@ const ProfileSelectionScreen = ({ onSelect }) => {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const res = await axios.get(`${SERVER_URL}/profiles`);
+        const res = await axios.get(`${SERVER_URL}/profiles`, { timeout: 5000 });
         let fetchedProfiles = res.data.profiles || [];
         
         const lastUser = localStorage.getItem('orlekino_last_user');

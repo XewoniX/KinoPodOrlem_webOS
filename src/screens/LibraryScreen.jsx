@@ -16,7 +16,7 @@ const LibraryScreen = ({ currentUser }) => {
 
   const fetchLibrary = async () => {
     try {
-      const res = await axios.post(`${SERVER_URL}/library`, { user: currentUser });
+      const res = await axios.post(`${SERVER_URL}/library`, { user: currentUser }, { timeout: 10000 });
       setItems(res.data.library || []);
     } catch (err) {
       console.error('Lib fetch err', err);

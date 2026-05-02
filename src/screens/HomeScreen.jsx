@@ -68,7 +68,7 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
   useEffect(() => {
     const fetchHome = async () => {
       try {
-        const res = await axios.get(`${SERVER_URL}/v3/home`, { params: { user: currentUser } });
+        const res = await axios.get(`${SERVER_URL}/v3/home`, { params: { user: currentUser }, timeout: 5000 });
         setRows(res.data.rows || []);
         setContinueWatching(res.data.continue_watching || []);
       } catch (e) {
@@ -82,7 +82,7 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
     // Polling continue watching
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get(`${SERVER_URL}/v3/continue`, { params: { user: currentUser } });
+        const res = await axios.get(`${SERVER_URL}/v3/continue`, { params: { user: currentUser }, timeout: 3000 });
         setContinueWatching(res.data.continue_watching || []);
       } catch (e) {}
     }, 5000);
