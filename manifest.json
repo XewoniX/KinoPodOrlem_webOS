@@ -1,14 +1,14 @@
 {
   "id": "com.xewonix.orlekino",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "web",
   "title": "Kino pod Orlem",
   "appDescription": "Aplikacja Kino pod Orlem dla TV LG webOS",
   "iconUri": "https://raw.githubusercontent.com/XewoniX/KinoPodOrlem_webOS/main/public/icon.png",
   "sourceUrl": "https://github.com/XewoniX/KinoPodOrlem_webOS",
-  "ipkUrl": "https://github.com/XewoniX/KinoPodOrlem_webOS/releases/download/TV-dom/com.xewonix.orlekino_1.1.0_all.ipk",
+  "ipkUrl": "https://github.com/XewoniX/KinoPodOrlem_webOS/releases/download/TV-dom/com.xewonix.orlekino_1.1.1_all.ipk",
   "ipkHash": {
-    "sha256": "385e5f4a3d33b6a5112d565b02b23a8f653f734de0832a224c7ea3cf3d5d0ccc"
+    "sha256": "173247debbf8b1fe3a6410a54697dd34500336f240614ae27e20c8617d4a7ed0"
   },
-  "ipkSize": 669280
+  "ipkSize": 669454
 }

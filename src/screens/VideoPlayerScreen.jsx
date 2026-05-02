@@ -51,26 +51,30 @@ const VideoPlayerScreen = () => {
     setShowOSD(true);
     if (osdTimerRef.current) clearTimeout(osdTimerRef.current);
     osdTimerRef.current = setTimeout(() => setShowOSD(false), 5000);
-    focusSelf();
-  }, [focusSelf]);
+    // Explicitly focus the close button when OSD appears
+    setTimeout(() => {
+        const closeBtn = document.querySelector('.close-button-player');
+        if (closeBtn && typeof closeBtn.focus === 'function') {
+            closeBtn.focus();
+        }
+    }, 100);
+  }, []);
 
   useEffect(() => {
     // Initial OSD hide
     osdTimerRef.current = setTimeout(() => setShowOSD(false), 5000);
     
-    // Auto-save interval (every 10 seconds)
     const interval = setInterval(saveProgress, 10000);
     
     return () => {
         if (osdTimerRef.current) clearTimeout(osdTimerRef.current);
         clearInterval(interval);
-        saveProgress(); // Final save on exit
+        saveProgress();
     };
   }, [saveProgress]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Handle Back button for WebOS (keyCode 461)
       if (e.keyCode === 461 || e.key === 'Backspace' || e.key === 'GoBack') {
           e.preventDefault();
           e.stopPropagation();
@@ -82,8 +86,6 @@ const VideoPlayerScreen = () => {
         case 'Enter':
           if (!showOSD) {
               toggleOSD();
-          } else {
-              // If OSD is visible, Enter might be handled by focused element (Close button)
           }
           break;
         case 'MediaPlayPause':
@@ -94,23 +96,23 @@ const VideoPlayerScreen = () => {
             } else {
               videoRef.current.pause();
               setIsPlaying(false);
-              setShowOSD(true); // Show OSD when paused
+              setShowOSD(true);
             }
           }
           break;
         case 'ArrowRight':
         case 'MediaFastForward':
           if (videoRef.current) videoRef.current.currentTime += 30;
-          toggleOSD();
+          if (!showOSD) toggleOSD();
           break;
         case 'ArrowLeft':
         case 'MediaRewind':
           if (videoRef.current) videoRef.current.currentTime -= 30;
-          toggleOSD();
+          if (!showOSD) toggleOSD();
           break;
         case 'ArrowUp':
         case 'ArrowDown':
-          toggleOSD();
+          if (!showOSD) toggleOSD();
           break;
         default:
           break;
@@ -123,7 +125,9 @@ const VideoPlayerScreen = () => {
 
   const { ref: closeBtnRef, focused: closeBtnFocused } = useFocusable({
       focusKey: 'CLOSE_BUTTON',
-      onEnterPress: () => saveProgress().finally(() => navigate(-1))
+      onEnterPress: () => {
+          saveProgress().finally(() => navigate(-1));
+      }
   });
 
   return (
@@ -148,7 +152,7 @@ const VideoPlayerScreen = () => {
             const videoErr = videoRef.current?.error;
             let msg = 'Nieznany błąd odtwarzacza';
             if (videoErr) {
-                if (videoErr.code === 3) msg = 'Błąd dekodowania - brak wsparcia dla kodeka.';
+                if (videoErr.code === 3) msg = 'Błąd dekodowania - brak wsparcia kodeka.';
                 else if (videoErr.code === 4) msg = 'Format nieobsługiwany.';
                 else msg = `Błąd wideo (kod ${videoErr.code})`;
             }
@@ -181,23 +185,24 @@ const VideoPlayerScreen = () => {
       {/* Custom OSD */}
       {showOSD && !error && (
         <div style={{
-          position: 'absolute', bottom: '0', left: '0', width: '100%',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', 
-          padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px', zIndex: 150,
-          transition: 'opacity 0.5s ease-in-out'
+          position: 'absolute', bottom: '40px', left: '50%', transform: 'translateX(-50%)', 
+          width: '80%', 
+          background: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.1)',
+          padding: '30px', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '15px', zIndex: 150,
+          boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
         }}>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ flex: 1 }}>
-                <h2 style={{ color: 'white', fontSize: '32px', marginBottom: '10px' }}>{filename}</h2>
+                <h2 style={{ color: 'white', fontSize: '24px', marginBottom: '10px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{filename}</h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <span style={{ fontSize: '20px', color: '#aaa' }}>
+                    <span style={{ fontSize: '18px', color: '#aaa' }}>
                         {Math.floor(currentTime / 60)}:{Math.floor(currentTime % 60).toString().padStart(2, '0')}
                     </span>
-                    <div style={{ flex: 1, height: '8px', backgroundColor: '#333', borderRadius: '4px', position: 'relative' }}>
-                        <div style={{ width: `${(currentTime / duration) * 100}%`, height: '100%', backgroundColor: 'var(--primary)', borderRadius: '4px' }} />
+                    <div style={{ flex: 1, height: '6px', backgroundColor: '#333', borderRadius: '3px', position: 'relative' }}>
+                        <div style={{ width: `${(currentTime / duration) * 100}%`, height: '100%', backgroundColor: 'var(--primary)', borderRadius: '3px' }} />
                     </div>
-                    <span style={{ fontSize: '20px', color: '#aaa' }}>
+                    <span style={{ fontSize: '18px', color: '#aaa' }}>
                         {Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, '0')}
                     </span>
                 </div>
@@ -206,11 +211,13 @@ const VideoPlayerScreen = () => {
               {/* Close Button */}
               <div 
                 ref={closeBtnRef}
-                className={`focusable ${closeBtnFocused ? 'focused' : ''}`}
+                tabIndex={0}
+                className={`focusable close-button-player ${closeBtnFocused ? 'focused' : ''}`}
                 style={{
-                    width: '80px', height: '80px', borderRadius: '40px', backgroundColor: closeBtnFocused ? 'red' : 'rgba(255,255,255,0.1)',
-                    display: 'flex', justifyContent: 'center', alignItems: 'center', marginLeft: '40px', cursor: 'pointer',
-                    fontSize: '40px', fontWeight: 'bold', color: 'white', transition: 'all 0.2s'
+                    width: '60px', height: '60px', borderRadius: '30px', 
+                    backgroundColor: closeBtnFocused ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center', marginLeft: '30px', cursor: 'pointer',
+                    fontSize: '24px', fontWeight: 'bold', color: 'white', transition: 'all 0.2s', outline: 'none'
                 }}
               >
                   ✕

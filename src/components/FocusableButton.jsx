@@ -1,16 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import { useFocusable } from '@noriginmedia/norigin-spatial-navigation';
 
-const FocusableButton = ({ text, onClick, color = '#333333', style, className = '', focusKey, onEnterPress }) => {
+const FocusableButton = ({ text, onClick, color = '#333333', style, className = '', focusKey, onEnterPress, noScroll = false }) => {
   const { ref, focused, focusSelf } = useFocusable({
     focusKey,
     onEnterPress: onEnterPress || onClick,
     onFocus: ({ node }) => {
-      node.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
-      });
+      if (!noScroll) {
+        node.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
     }
   });
 

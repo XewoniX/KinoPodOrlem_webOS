@@ -56,7 +56,7 @@ const MainAppScreen = ({ currentUser, onLogout }) => {
 
   return (
     <FocusContext.Provider value={focusKey}>
-      <div ref={ref} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div ref={ref} style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
         {/* Top Navigation Bar */}
         <div style={{
           display: 'flex',
@@ -83,7 +83,7 @@ const MainAppScreen = ({ currentUser, onLogout }) => {
         </div>
 
         {/* Main Content Area */}
-        <div style={{ flex: 1, position: 'relative' }}>
+        <div style={{ flex: 1, position: 'relative', overflowY: 'auto' }}>
           {activeTab === 'HOME' && <HomeScreen currentUser={currentUser} onMovieSelect={setSelectedMovie} />}
           {activeTab === 'SEARCH' && <SearchScreen currentUser={currentUser} onMovieSelect={setSelectedMovie} />}
           {activeTab === 'LIBRARY' && <LibraryScreen currentUser={currentUser} />}
