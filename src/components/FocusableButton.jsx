@@ -14,8 +14,8 @@ const FocusableButton = ({ text, onClick, color = '#333333', style, className = 
       className={`focusable btn-primary ${focused ? 'focused' : ''} ${className}`}
       style={{
         backgroundColor: color,
-        padding: '12px 24px',
-        borderRadius: '12px',
+        padding: '16px 32px',
+        borderRadius: '16px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',

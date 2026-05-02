@@ -22,15 +22,15 @@ const ProfileAvatar = ({ name, onClick, focusKey }) => {
       }}
     >
       <div style={{
-        width: '120px',
-        height: '120px',
-        borderRadius: '60px',
+        width: '180px',
+        height: '180px',
+        borderRadius: '90px',
         backgroundColor: focused ? 'var(--primary)' : '#333333',
         border: focused ? '4px solid white' : '4px solid transparent',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        fontSize: '48px',
+        fontSize: '72px',
         fontWeight: 'bold',
         color: 'white',
         transition: 'all 0.2s',

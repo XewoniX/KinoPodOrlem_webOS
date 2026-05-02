@@ -29,11 +29,11 @@ const MovieCard = ({ movie, onClick, focusKey }) => {
       onClick={onClick}
       className={`focusable ${focused ? 'focused' : ''}`}
       style={{
-        width: '180px',
-        height: '270px',
+        width: '220px',
+        height: '330px',
         borderRadius: '12px',
         backgroundColor: 'var(--card-bg)',
-        border: focused ? '3px solid white' : '1px solid var(--card-border)',
+        border: focused ? '4px solid white' : '1px solid var(--card-border)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -44,17 +44,17 @@ const MovieCard = ({ movie, onClick, focusKey }) => {
     >
       <div style={{ flex: 1, backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
         {movie.is_downloaded && (
-          <div style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: 'green', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' }}>
+          <div style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: 'green', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>
             POBRANE
           </div>
         )}
       </div>
-      <div style={{ padding: '8px', height: '60px', backgroundColor: focused ? '#2A2A2A' : 'var(--card-bg)' }}>
-        <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <div style={{ padding: '12px', height: '80px', backgroundColor: focused ? '#2A2A2A' : 'var(--card-bg)' }}>
+        <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {mainTitle}
         </div>
         {tags && (
-          <div style={{ fontSize: '10px', color: 'var(--primary)', marginTop: '4px' }}>
+          <div style={{ fontSize: '14px', color: 'var(--primary)', marginTop: '4px' }}>
             {tags}
           </div>
         )}

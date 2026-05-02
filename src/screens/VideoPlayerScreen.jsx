@@ -11,40 +11,42 @@ const VideoPlayerScreen = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(null);
+  const [loadStatus, setLoadStatus] = useState('Inicjalizacja...');
 
   // state: { folder: string, filename: string, startPos: number }
   const folder = state?.folder || '';
   const filename = state?.filename || '';
   const startPos = state?.startPos || 0;
 
+  // IMPORTANT: For WebOS 3.5, we try to avoid double encoding if possible, 
+  // but Flask path needs the slashes to be part of the path.
   const encodedFolder = encodeURIComponent(folder);
   const encodedFile = encodeURIComponent(filename);
   const streamUrl = `${SERVER_URL}/stream/${encodedFolder}/${encodedFile}`;
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (!videoRef.current) return;
-      
+      console.log("Player Key:", e.key);
       switch (e.key) {
         case 'Enter':
         case 'MediaPlayPause':
-        case 'MediaPlay':
-        case 'MediaPause':
-          if (videoRef.current.paused) {
-            videoRef.current.play().catch(err => console.error("Play error:", err));
-            setIsPlaying(true);
-          } else {
-            videoRef.current.pause();
-            setIsPlaying(false);
+          if (videoRef.current) {
+            if (videoRef.current.paused) {
+              videoRef.current.play().catch(err => setError("Błąd startu: " + err.message));
+              setIsPlaying(true);
+            } else {
+              videoRef.current.pause();
+              setIsPlaying(false);
+            }
           }
           break;
         case 'ArrowRight':
         case 'MediaFastForward':
-          videoRef.current.currentTime += 30;
+          if (videoRef.current) videoRef.current.currentTime += 30;
           break;
         case 'ArrowLeft':
         case 'MediaRewind':
-          videoRef.current.currentTime -= 30;
+          if (videoRef.current) videoRef.current.currentTime -= 30;
           break;
         case 'Escape':
         case 'Backspace':
@@ -60,67 +62,91 @@ const VideoPlayerScreen = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navigate]);
 
-  useEffect(() => {
-    if (videoRef.current && startPos > 0) {
-      const handleMetadata = () => {
-        videoRef.current.currentTime = startPos;
-      };
-      const v = videoRef.current;
-      v.addEventListener('loadedmetadata', handleMetadata);
-      return () => v.removeEventListener('loadedmetadata', handleMetadata);
-    }
-  }, [startPos]);
-
   return (
-    <div style={{ width: '100vw', height: '100vh', backgroundColor: 'black', position: 'relative' }}>
+    <div style={{ width: '100vw', height: '100vh', backgroundColor: 'black', position: 'relative', color: 'white' }}>
+      
+      {/* Background Video */}
       <video 
         ref={videoRef}
         autoPlay
         playsInline
         style={{ width: '100%', height: '100%' }}
+        onLoadStart={() => setLoadStatus('Ładowanie strumienia...')}
+        onWaiting={() => setLoadStatus('Buforowanie...')}
+        onPlaying={() => {
+            setLoadStatus('Odtwarzanie');
+            setIsPlaying(true);
+            if (startPos > 0 && videoRef.current && videoRef.current.currentTime < 1) {
+                videoRef.current.currentTime = startPos;
+            }
+        }}
         onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
         onLoadedMetadata={() => {
             setDuration(videoRef.current?.duration || 0);
-            setError(null);
+            setLoadStatus('Metadane załadowane');
         }}
-        onEnded={() => navigate(-1)}
         onError={(e) => {
-            console.error('Video Error Event:', e);
-            setError('Błąd odtwarzania: Format nieobsługiwany lub problem z połączeniem.');
+            const videoErr = videoRef.current?.error;
+            let msg = 'Nieznany błąd odtwarzacza';
+            if (videoErr) {
+                if (videoErr.code === 1) msg = 'Pobieranie przerwane (Aborted)';
+                else if (videoErr.code === 2) msg = 'Błąd sieci (Network Error)';
+                else if (videoErr.code === 3) msg = 'Błąd dekodowania (Decoding Error) - prawdopodobnie brak wsparcia dla kodeka na tym TV.';
+                else if (videoErr.code === 4) msg = 'Format nieobsługiwany (Format not supported)';
+            }
+            setError(msg);
         }}
       >
           <source src={streamUrl} type="video/mp4" />
           <source src={streamUrl} type="video/x-matroska" />
-          Twoja wersja systemu webOS nie wspiera tego formatu wideo.
       </video>
 
+      {/* Debug Info Overlay (Temporary to find the issue) */}
+      <div style={{ 
+          position: 'absolute', top: '20px', left: '20px', 
+          backgroundColor: 'rgba(0,0,0,0.5)', padding: '10px', fontSize: '14px', zIndex: 100 
+      }}>
+          <div>Status: {loadStatus}</div>
+          <div style={{ fontSize: '10px', maxWidth: '80vw', wordBreak: 'break-all' }}>URL: {streamUrl}</div>
+      </div>
+
+      {/* Error Overlay */}
       {error && (
         <div style={{
-          position: 'absolute', top: '40%', left: '10%', right: '10%',
-          backgroundColor: 'rgba(200,0,0,0.8)', padding: '32px', borderRadius: '12px',
-          textAlign: 'center', color: 'white'
+          position: 'absolute', top: '0', left: '0', width: '100%', height: '100%',
+          backgroundColor: 'rgba(50,0,0,0.9)', display: 'flex', flexDirection: 'column', 
+          justifyContent: 'center', alignItems: 'center', padding: '40px', textAlign: 'center', zIndex: 200
         }}>
-          <h2 style={{ marginBottom: '16px' }}>{error}</h2>
+          <h1 style={{ color: '#ff4444', marginBottom: '24px' }}>BŁĄD ODTWARZANIA</h1>
+          <p style={{ fontSize: '24px', marginBottom: '40px', maxWidth: '800px' }}>{error}</p>
+          <p style={{ fontSize: '16px', color: '#aaa', marginBottom: '40px' }}>
+              Jeśli widzisz "Błąd dekodowania", Twój telewizor nie potrafi odtworzyć tego konkretnego pliku bez transkodowania.
+          </p>
           <button 
             onClick={() => navigate(-1)}
-            style={{ padding: '12px 24px', fontSize: '20px', backgroundColor: 'white', border: 'none', borderRadius: '8px' }}
+            className="focusable focused"
+            style={{ 
+                padding: '20px 48px', fontSize: '24px', backgroundColor: 'white', 
+                border: 'none', borderRadius: '12px', cursor: 'pointer' 
+            }}
           >
-            POWRÓT
+            POWRÓT DO MENU
           </button>
         </div>
       )}
 
+      {/* Custom OSD */}
       {!isPlaying && !error && (
         <div style={{
           position: 'absolute', bottom: '10%', left: '10%', right: '10%',
-          backgroundColor: 'rgba(0,0,0,0.7)', padding: '24px', borderRadius: '12px',
-          display: 'flex', flexDirection: 'column', gap: '16px'
+          backgroundColor: 'rgba(0,0,0,0.8)', padding: '32px', borderRadius: '16px',
+          display: 'flex', flexDirection: 'column', gap: '20px'
         }}>
-          <h2 style={{ color: 'white' }}>{filename}</h2>
-          <div style={{ width: '100%', height: '8px', backgroundColor: '#333', borderRadius: '4px' }}>
-             <div style={{ width: `${(currentTime / duration) * 100}%`, height: '100%', backgroundColor: 'var(--primary)', borderRadius: '4px' }} />
+          <h2 style={{ color: 'white', fontSize: '32px' }}>{filename}</h2>
+          <div style={{ width: '100%', height: '12px', backgroundColor: '#333', borderRadius: '6px' }}>
+             <div style={{ width: `${(currentTime / duration) * 100}%`, height: '100%', backgroundColor: 'var(--primary)', borderRadius: '6px' }} />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'gray' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#aaa', fontSize: '24px' }}>
             <span>{Math.floor(currentTime / 60)}:{Math.floor(currentTime % 60).toString().padStart(2, '0')}</span>
             <span>{Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, '0')}</span>
           </div>
