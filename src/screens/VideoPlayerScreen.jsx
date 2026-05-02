@@ -25,7 +25,16 @@ const VideoPlayerScreen = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      console.log("Player Key:", e.key);
+      console.log("Player Key:", e.key, e.keyCode);
+      
+      // Handle Back button for WebOS (keyCode 461)
+      if (e.keyCode === 461 || e.key === 'Backspace' || e.key === 'Escape' || e.key === 'GoBack') {
+          e.preventDefault();
+          e.stopPropagation();
+          navigate(-1);
+          return;
+      }
+
       switch (e.key) {
         case 'Enter':
         case 'MediaPlayPause':
@@ -46,14 +55,6 @@ const VideoPlayerScreen = () => {
         case 'ArrowLeft':
         case 'MediaRewind':
           if (videoRef.current) videoRef.current.currentTime -= 30;
-          break;
-        case 'Escape':
-        case 'Backspace':
-        case 'GoBack':
-        case 'Back':
-        case 'XF86Back':
-          e.preventDefault();
-          navigate(-1);
           break;
         default:
           break;
