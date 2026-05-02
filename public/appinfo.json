@@ -1,0 +1,14 @@
+{
+  "id": "com.xewonix.orlekino",
+  "version": "1.0.0",
+  "vendor": "Xewonix",
+  "type": "web",
+  "main": "index.html",
+  "title": "Kino pod Orlem",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "bgColor": "#121212",
+  "resolution": "1920x1080",
+  "transparent": false,
+  "appDescription": "Kopia 1:1 Kino pod Orlem dla WebOS"
+}
