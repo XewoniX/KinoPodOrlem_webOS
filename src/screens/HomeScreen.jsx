@@ -30,34 +30,37 @@ const ContinueWatchingCard = ({ item, onClick, focusKey }) => {
       onClick={onClick}
       className={`focusable ${focused ? 'focused' : ''}`}
       style={{
-        width: '240px',
-        height: '300px',
-        borderRadius: '16px',
+        width: '340px',
+        height: '510px',
+        borderRadius: '20px',
         backgroundColor: focused ? '#2A2A2A' : '#1A1A1A',
-        border: focused ? '3px solid white' : '3px solid transparent',
+        border: focused ? '8px solid white' : '3px solid transparent',
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
         overflow: 'hidden',
+        boxShadow: focused ? '0 10px 30px rgba(0,0,0,0.5)' : 'none',
+        zIndex: focused ? 10 : 1,
+        transition: 'all 0.2s'
       }}
     >
-      <div style={{ height: '180px', position: 'relative', backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '6px', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+      <div style={{ height: '340px', position: 'relative', backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '10px', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div style={{ width: `${item.percent}%`, height: '100%', backgroundColor: 'var(--primary)' }} />
         </div>
         {focused && (
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'var(--primary)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px' }}>▶</div>
+            <div style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: 'var(--primary)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '32px' }}>▶</div>
           </div>
         )}
       </div>
-      <div style={{ padding: '12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', lineHeight: '1.2' }}>
+      <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', lineHeight: '1.2' }}>
           {displayTitle}
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '16px', color: 'var(--primary)' }}>{episodeLabel}</span>
-          <span style={{ fontSize: '16px', color: 'gray' }}>{Math.floor(item.percent)}%</span>
+          <span style={{ fontSize: '20px', color: 'var(--primary)' }}>{episodeLabel}</span>
+          <span style={{ fontSize: '20px', color: 'gray' }}>{Math.floor(item.percent)}%</span>
         </div>
       </div>
     </div>
@@ -111,9 +114,9 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
         ) : (
           <>
             {continueWatching.length > 0 && (
-              <div style={{ marginBottom: '32px' }}>
-                <h2 style={{ color: 'var(--primary)', marginBottom: '16px' }}>▶ Oglądaj dalej</h2>
-                <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px' }}>
+              <div style={{ marginBottom: '48px' }}>
+                <h2 style={{ color: 'var(--primary)', marginBottom: '24px', fontSize: '36px' }}>▶ Oglądaj dalej</h2>
+                <div style={{ display: 'flex', gap: '32px', overflowX: 'auto', paddingBottom: '24px' }}>
                   {continueWatching.map((item, idx) => (
                     <ContinueWatchingCard 
                       key={`${item.folder}_${item.filename}`} 
@@ -122,14 +125,14 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
                     />
                   ))}
                 </div>
-                <div style={{ height: '1px', backgroundColor: '#2A2A2A', margin: '16px 0' }} />
+                <div style={{ height: '1px', backgroundColor: '#2A2A2A', margin: '24px 0' }} />
               </div>
             )}
 
             {rows.map((row, rIdx) => (
-              <div key={row.title} style={{ marginBottom: '32px' }}>
-                <h2 style={{ color: 'white', marginBottom: '16px' }}>{row.title}</h2>
-                <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px' }}>
+              <div key={row.title} style={{ marginBottom: '48px' }}>
+                <h2 style={{ color: 'white', marginBottom: '24px', fontSize: '36px' }}>{row.title}</h2>
+                <div style={{ display: 'flex', gap: '32px', overflowX: 'auto', paddingBottom: '24px' }}>
                   {row.items.map((movie, mIdx) => (
                     <MovieCard 
                       key={`${rIdx}_${mIdx}`} 

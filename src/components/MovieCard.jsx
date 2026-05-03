@@ -36,32 +36,34 @@ const MovieCard = ({ movie, onClick, focusKey }) => {
       onClick={onClick}
       className={`focusable ${focused ? 'focused' : ''}`}
       style={{
-        width: '280px',
-        height: '420px',
-        borderRadius: '16px',
+        width: '340px',
+        height: '510px',
+        borderRadius: '20px',
         backgroundColor: 'var(--card-bg)',
-        border: focused ? '6px solid white' : '1px solid var(--card-border)',
+        border: focused ? '8px solid white' : '1px solid var(--card-border)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
         position: 'relative',
         transition: 'all 0.2s',
+        boxShadow: focused ? '0 10px 30px rgba(0,0,0,0.5)' : 'none',
+        zIndex: focused ? 10 : 1
       }}
     >
       <div style={{ flex: 1, backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
         {movie.is_downloaded && (
-          <div style={{ position: 'absolute', top: '12px', right: '12px', backgroundColor: 'green', color: 'white', padding: '6px 12px', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold' }}>
+          <div style={{ position: 'absolute', top: '16px', right: '16px', backgroundColor: 'green', color: 'white', padding: '8px 16px', borderRadius: '8px', fontSize: '18px', fontWeight: 'bold', zIndex: 5 }}>
             POBRANE
           </div>
         )}
       </div>
-      <div style={{ padding: '16px', backgroundColor: focused ? '#2A2A2A' : 'var(--card-bg)' }}>
-        <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'white', lineHeight: '1.2' }}>
+      <div style={{ padding: '20px', backgroundColor: focused ? '#2A2A2A' : 'var(--card-bg)' }}>
+        <div style={{ fontSize: '26px', fontWeight: 'bold', color: 'white', lineHeight: '1.2' }}>
           {mainTitle}
         </div>
         {tags && (
-          <div style={{ fontSize: '16px', color: 'var(--primary)', marginTop: '8px' }}>
+          <div style={{ fontSize: '18px', color: 'var(--primary)', marginTop: '10px' }}>
             {tags}
           </div>
         )}
