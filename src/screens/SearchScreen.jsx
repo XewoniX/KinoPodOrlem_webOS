@@ -10,6 +10,10 @@ const FocusableInput = ({ value, onChange, placeholder, onEnterPress }) => {
     onEnterPress: () => {
         // Trigger virtual keyboard or focus on webOS
         ref.current.focus();
+    },
+    onBlur: () => {
+        // Ensure native focus is removed when spatial focus leaves
+        ref.current.blur();
     }
   });
 
