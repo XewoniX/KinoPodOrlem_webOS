@@ -114,9 +114,16 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
         ) : (
           <>
             {continueWatching.length > 0 && (
-              <div style={{ marginBottom: '48px' }}>
-                <h2 style={{ color: 'var(--primary)', marginBottom: '24px', fontSize: '36px' }}>▶ Oglądaj dalej</h2>
-                <div style={{ display: 'flex', gap: '32px', overflowX: 'auto', paddingBottom: '24px' }}>
+              <div style={{ marginBottom: '64px' }}>
+                <h2 style={{ color: 'var(--primary)', marginBottom: '32px', fontSize: '42px' }}>▶ Oglądaj dalej</h2>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateRows: 'repeat(2, 510px)', 
+                  gridAutoFlow: 'column', 
+                  gap: '32px', 
+                  overflowX: 'auto', 
+                  paddingBottom: '32px' 
+                }}>
                   {continueWatching.map((item, idx) => (
                     <ContinueWatchingCard 
                       key={`${item.folder}_${item.filename}`} 
@@ -125,14 +132,21 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
                     />
                   ))}
                 </div>
-                <div style={{ height: '1px', backgroundColor: '#2A2A2A', margin: '24px 0' }} />
+                <div style={{ height: '2px', backgroundColor: '#2A2A2A', margin: '32px 0' }} />
               </div>
             )}
 
             {rows.map((row, rIdx) => (
-              <div key={row.title} style={{ marginBottom: '48px' }}>
-                <h2 style={{ color: 'white', marginBottom: '24px', fontSize: '36px' }}>{row.title}</h2>
-                <div style={{ display: 'flex', gap: '32px', overflowX: 'auto', paddingBottom: '24px' }}>
+              <div key={row.title} style={{ marginBottom: '64px' }}>
+                <h2 style={{ color: 'white', marginBottom: '32px', fontSize: '42px' }}>{row.title}</h2>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateRows: 'repeat(2, 510px)', 
+                  gridAutoFlow: 'column', 
+                  gap: '32px', 
+                  overflowX: 'auto', 
+                  paddingBottom: '32px' 
+                }}>
                   {row.items.map((movie, mIdx) => (
                     <MovieCard 
                       key={`${rIdx}_${mIdx}`} 
