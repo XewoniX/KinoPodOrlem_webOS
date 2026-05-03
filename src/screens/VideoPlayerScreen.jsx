@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useFocusable, FocusContext } from '@noriginmedia/norigin-spatial-navigation';
+import { useFocusable, FocusContext, setFocus } from '@noriginmedia/norigin-spatial-navigation';
 import { SERVER_URL } from '../config';
 
 const VideoPlayerScreen = () => {
@@ -51,17 +51,13 @@ const VideoPlayerScreen = () => {
     setShowOSD(true);
     if (osdTimerRef.current) clearTimeout(osdTimerRef.current);
     osdTimerRef.current = setTimeout(() => setShowOSD(false), 5000);
-    // Explicitly focus the close button when OSD appears
-    setTimeout(() => {
-        const closeBtn = document.querySelector('.close-button-player');
-        if (closeBtn && typeof closeBtn.focus === 'function') {
-            closeBtn.focus();
-        }
-    }, 100);
   }, []);
 
   useEffect(() => {
-    // Initial OSD hide
+    // Focus the screen/container on mount
+    focusSelf();
+    
+    // Initial OSD hide timer
     osdTimerRef.current = setTimeout(() => setShowOSD(false), 5000);
     
     const interval = setInterval(saveProgress, 10000);
@@ -71,10 +67,21 @@ const VideoPlayerScreen = () => {
         clearInterval(interval);
         saveProgress();
     };
-  }, [saveProgress]);
+  }, [saveProgress, focusSelf]);
+
+  useEffect(() => {
+    if (showOSD) {
+        // When OSD appears, give it a moment to render then focus the close button
+        const timer = setTimeout(() => {
+            setFocus('CLOSE_BUTTON');
+        }, 100);
+        return () => clearTimeout(timer);
+    }
+  }, [showOSD]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Handle back button specifically for webOS
       if (e.keyCode === 461 || e.key === 'Backspace' || e.key === 'GoBack') {
           e.preventDefault();
           e.stopPropagation();
@@ -165,21 +172,7 @@ const VideoPlayerScreen = () => {
 
       {/* Error Overlay */}
       {error && (
-        <div style={{
-          position: 'absolute', top: '0', left: '0', width: '100%', height: '100%',
-          backgroundColor: 'rgba(50,0,0,0.9)', display: 'flex', flexDirection: 'column', 
-          justifyContent: 'center', alignItems: 'center', padding: '40px', textAlign: 'center', zIndex: 200
-        }}>
-          <h1 style={{ color: '#ff4444', marginBottom: '24px' }}>BŁĄD ODTWARZANIA</h1>
-          <p style={{ fontSize: '24px', marginBottom: '40px' }}>{error}</p>
-          <button 
-            onClick={() => navigate(-1)}
-            className="focusable focused"
-            style={{ padding: '20px 48px', fontSize: '24px', backgroundColor: 'white', border: 'none', borderRadius: '12px' }}
-          >
-            POWRÓT DO MENU
-          </button>
-        </div>
+        <ErrorOverlay error={error} onBack={() => navigate(-1)} />
       )}
 
       {/* Custom OSD */}
@@ -228,6 +221,41 @@ const VideoPlayerScreen = () => {
     </div>
     </FocusContext.Provider>
   );
+};
+
+const ErrorOverlay = ({ error, onBack }) => {
+    const { ref, focused, focusSelf } = useFocusable({
+        focusKey: 'ERROR_BACK_BUTTON',
+        onEnterPress: onBack
+    });
+
+    useEffect(() => {
+        focusSelf();
+    }, [focusSelf]);
+
+    return (
+        <div style={{
+          position: 'absolute', top: '0', left: '0', width: '100%', height: '100%',
+          backgroundColor: 'rgba(50,0,0,0.9)', display: 'flex', flexDirection: 'column', 
+          justifyContent: 'center', alignItems: 'center', padding: '40px', textAlign: 'center', zIndex: 200
+        }}>
+          <h1 style={{ color: '#ff4444', marginBottom: '24px' }}>BŁĄD ODTWARZANIA</h1>
+          <p style={{ fontSize: '24px', marginBottom: '40px' }}>{error}</p>
+          <div 
+            ref={ref}
+            onClick={onBack}
+            className={`focusable ${focused ? 'focused' : ''}`}
+            style={{ 
+                padding: '20px 48px', fontSize: '24px', 
+                backgroundColor: focused ? 'var(--primary)' : 'white', 
+                color: focused ? 'white' : 'black',
+                border: 'none', borderRadius: '12px', cursor: 'pointer' 
+            }}
+          >
+            POWRÓT DO MENU
+          </div>
+        </div>
+    );
 };
 
 export default VideoPlayerScreen;
