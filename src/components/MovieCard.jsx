@@ -20,7 +20,7 @@ const MovieCard = ({ movie, onClick, focusKey }) => {
       node.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
-        inline: 'nearest'
+        inline: 'center'
       });
     }
   });
@@ -36,11 +36,11 @@ const MovieCard = ({ movie, onClick, focusKey }) => {
       onClick={onClick}
       className={`focusable ${focused ? 'focused' : ''}`}
       style={{
-        width: '220px',
-        height: '330px',
-        borderRadius: '12px',
+        width: '280px',
+        height: '420px',
+        borderRadius: '16px',
         backgroundColor: 'var(--card-bg)',
-        border: focused ? '4px solid white' : '1px solid var(--card-border)',
+        border: focused ? '6px solid white' : '1px solid var(--card-border)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -51,17 +51,17 @@ const MovieCard = ({ movie, onClick, focusKey }) => {
     >
       <div style={{ flex: 1, backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
         {movie.is_downloaded && (
-          <div style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: 'green', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>
+          <div style={{ position: 'absolute', top: '12px', right: '12px', backgroundColor: 'green', color: 'white', padding: '6px 12px', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold' }}>
             POBRANE
           </div>
         )}
       </div>
-      <div style={{ padding: '12px', height: '80px', backgroundColor: focused ? '#2A2A2A' : 'var(--card-bg)' }}>
-        <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <div style={{ padding: '16px', backgroundColor: focused ? '#2A2A2A' : 'var(--card-bg)' }}>
+        <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'white', lineHeight: '1.2' }}>
           {mainTitle}
         </div>
         {tags && (
-          <div style={{ fontSize: '14px', color: 'var(--primary)', marginTop: '4px' }}>
+          <div style={{ fontSize: '16px', color: 'var(--primary)', marginTop: '8px' }}>
             {tags}
           </div>
         )}

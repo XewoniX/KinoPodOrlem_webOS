@@ -240,11 +240,11 @@ const VideoPlayerScreen = () => {
                </div>
  
                {/* Controls Row */}
-               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', marginTop: '10px' }}>
+               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '50px', marginTop: '10px' }}>
                    <ControlButton buttonRef={rewindRef} icon="⏪" focused={rewindFocused} onClick={handleRewind} />
                    <ControlButton buttonRef={playPauseRef} icon={isPlaying ? "⏸" : "▶"} focused={playPauseFocused} onClick={handlePlayPause} />
                    <ControlButton buttonRef={ffRef} icon="⏩" focused={ffFocused} onClick={handleFastForward} />
-                   <ControlButton buttonRef={closeBtnRef} icon="✕" focused={closeBtnFocused} onClick={() => saveProgress().finally(() => navigate(-1))} style={{ marginLeft: '40px' }} />
+                   <ControlButton buttonRef={closeBtnRef} icon="✕" focused={closeBtnFocused} onClick={() => saveProgress().finally(() => navigate(-1))} />
                </div>
            </div>
          </div>

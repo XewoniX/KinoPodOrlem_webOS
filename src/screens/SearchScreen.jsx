@@ -42,12 +42,12 @@ const SearchScreen = ({ currentUser, onMovieSelect }) => {
             placeholder="Szukaj (min. 3 znaki)..."
             style={{
               flex: 1,
-              padding: '16px 24px',
-              borderRadius: '24px',
+              padding: '20px 32px',
+              borderRadius: '32px',
               backgroundColor: '#1E1E1E',
               border: '2px solid #333',
               color: 'white',
-              fontSize: '18px',
+              fontSize: '24px',
               outline: 'none'
             }}
           />
@@ -55,7 +55,7 @@ const SearchScreen = ({ currentUser, onMovieSelect }) => {
             text="SZUKAJ" 
             onClick={handleSearch} 
             color="var(--primary)" 
-            style={{ borderRadius: '24px' }} 
+            style={{ borderRadius: '32px', padding: '16px 48px' }} 
           />
         </div>
 

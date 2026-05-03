@@ -13,7 +13,7 @@ const ContinueWatchingCard = ({ item, onClick, focusKey }) => {
       node.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
-        inline: 'nearest'
+        inline: 'center'
       });
     }
   });
@@ -30,34 +30,34 @@ const ContinueWatchingCard = ({ item, onClick, focusKey }) => {
       onClick={onClick}
       className={`focusable ${focused ? 'focused' : ''}`}
       style={{
-        width: '180px',
-        height: '210px',
-        borderRadius: '12px',
+        width: '240px',
+        height: '300px',
+        borderRadius: '16px',
         backgroundColor: focused ? '#2A2A2A' : '#1A1A1A',
-        border: focused ? '2px solid white' : '2px solid transparent',
+        border: focused ? '3px solid white' : '3px solid transparent',
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
         overflow: 'hidden',
       }}
     >
-      <div style={{ height: '130px', position: 'relative', backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '4px', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+      <div style={{ height: '180px', position: 'relative', backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '6px', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div style={{ width: `${item.percent}%`, height: '100%', backgroundColor: 'var(--primary)' }} />
         </div>
         {focused && (
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'var(--primary)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white' }}>▶</div>
+            <div style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'var(--primary)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px' }}>▶</div>
           </div>
         )}
       </div>
-      <div style={{ padding: '8px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: '12px', fontWeight: 'bold', color: 'white', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+      <div style={{ padding: '12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', lineHeight: '1.2' }}>
           {displayTitle}
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '11px', color: 'var(--primary)' }}>{episodeLabel}</span>
-          <span style={{ fontSize: '11px', color: 'gray' }}>{Math.floor(item.percent)}%</span>
+          <span style={{ fontSize: '16px', color: 'var(--primary)' }}>{episodeLabel}</span>
+          <span style={{ fontSize: '16px', color: 'gray' }}>{Math.floor(item.percent)}%</span>
         </div>
       </div>
     </div>
