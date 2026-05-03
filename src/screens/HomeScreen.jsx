@@ -118,9 +118,6 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
                 <h2 style={{ color: 'var(--primary)', marginBottom: '32px', fontSize: '42px' }}>▶ Oglądaj dalej</h2>
                 <div style={{ 
                   display: 'flex',
-                  flexDirection: 'column',
-                  flexWrap: 'wrap',
-                  height: '960px', // 450*2 + 32 (gap) + padding
                   gap: '32px', 
                   overflowX: 'auto', 
                   paddingBottom: '32px' 

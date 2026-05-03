@@ -81,9 +81,13 @@ const SearchScreen = ({ currentUser, onMovieSelect }) => {
 
         {loading && <div style={{ color: 'var(--primary)', fontSize: '24px' }}>Szukam...</div>}
         {error && <div style={{ color: 'red', fontSize: '24px' }}>{error}</div>}
+        
+        <div style={{ color: 'gray', fontSize: '18px', marginBottom: '16px' }}>
+          💡 Naciśnij przycisk OK aby wpisać tekst. Po zakończeniu naciśnij WSTECZ aby wyjść z trybu pisania i nawigować po wynikach.
+        </div>
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px' }}>
             {results.map((movie, idx) => (
               <MovieCard 
                 key={idx} 
