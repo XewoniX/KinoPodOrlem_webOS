@@ -36,8 +36,8 @@ const MovieCard = ({ movie, onClick, focusKey }) => {
       onClick={onClick}
       className={`focusable ${focused ? 'focused' : ''}`}
       style={{
-        width: '340px',
-        height: '510px',
+        width: '300px',
+        height: '450px',
         borderRadius: '20px',
         backgroundColor: 'var(--card-bg)',
         border: focused ? '8px solid white' : '1px solid var(--card-border)',

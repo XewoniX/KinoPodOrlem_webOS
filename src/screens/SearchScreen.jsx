@@ -5,6 +5,37 @@ import MovieCard from '../components/MovieCard';
 import FocusableButton from '../components/FocusableButton';
 import { SERVER_URL } from '../config';
 
+const FocusableInput = ({ value, onChange, placeholder, onEnterPress }) => {
+  const { ref, focused } = useFocusable({
+    onEnterPress: () => {
+        // Trigger virtual keyboard or focus on webOS
+        ref.current.focus();
+    }
+  });
+
+  return (
+    <input 
+      ref={ref}
+      type="text" 
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className={`focusable ${focused ? 'focused' : ''}`}
+      style={{
+        flex: 1,
+        padding: '20px 32px',
+        borderRadius: '32px',
+        backgroundColor: '#1E1E1E',
+        border: focused ? '4px solid white' : '2px solid #333',
+        color: 'white',
+        fontSize: '24px',
+        outline: 'none',
+        transition: 'all 0.2s'
+      }}
+    />
+  );
+};
+
 const SearchScreen = ({ currentUser, onMovieSelect }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -35,21 +66,10 @@ const SearchScreen = ({ currentUser, onMovieSelect }) => {
     <FocusContext.Provider value={focusKey}>
       <div ref={ref} style={{ padding: '24px 48px', height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-          <input 
-            type="text" 
+          <FocusableInput 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Szukaj (min. 3 znaki)..."
-            style={{
-              flex: 1,
-              padding: '20px 32px',
-              borderRadius: '32px',
-              backgroundColor: '#1E1E1E',
-              border: '2px solid #333',
-              color: 'white',
-              fontSize: '24px',
-              outline: 'none'
-            }}
           />
           <FocusableButton 
             text="SZUKAJ" 
@@ -59,11 +79,11 @@ const SearchScreen = ({ currentUser, onMovieSelect }) => {
           />
         </div>
 
-        {loading && <div style={{ color: 'var(--primary)' }}>Szukam...</div>}
-        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {loading && <div style={{ color: 'var(--primary)', fontSize: '24px' }}>Szukam...</div>}
+        {error && <div style={{ color: 'red', fontSize: '24px' }}>{error}</div>}
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
             {results.map((movie, idx) => (
               <MovieCard 
                 key={idx} 

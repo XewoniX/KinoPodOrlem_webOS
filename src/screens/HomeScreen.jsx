@@ -30,8 +30,8 @@ const ContinueWatchingCard = ({ item, onClick, focusKey }) => {
       onClick={onClick}
       className={`focusable ${focused ? 'focused' : ''}`}
       style={{
-        width: '340px',
-        height: '510px',
+        width: '300px',
+        height: '450px',
         borderRadius: '20px',
         backgroundColor: focused ? '#2A2A2A' : '#1A1A1A',
         border: focused ? '8px solid white' : '3px solid transparent',
@@ -44,7 +44,7 @@ const ContinueWatchingCard = ({ item, onClick, focusKey }) => {
         transition: 'all 0.2s'
       }}
     >
-      <div style={{ height: '340px', position: 'relative', backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <div style={{ height: '300px', position: 'relative', backgroundColor: '#333', backgroundImage: imgUrl ? `url('${imgUrl}')` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '10px', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div style={{ width: `${item.percent}%`, height: '100%', backgroundColor: 'var(--primary)' }} />
         </div>
@@ -117,9 +117,10 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
               <div style={{ marginBottom: '64px' }}>
                 <h2 style={{ color: 'var(--primary)', marginBottom: '32px', fontSize: '42px' }}>▶ Oglądaj dalej</h2>
                 <div style={{ 
-                  display: 'grid', 
-                  gridTemplateRows: 'repeat(2, 510px)', 
-                  gridAutoFlow: 'column', 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexWrap: 'wrap',
+                  height: '960px', // 450*2 + 32 (gap) + padding
                   gap: '32px', 
                   overflowX: 'auto', 
                   paddingBottom: '32px' 
@@ -140,9 +141,10 @@ const HomeScreen = ({ currentUser, onMovieSelect }) => {
               <div key={row.title} style={{ marginBottom: '64px' }}>
                 <h2 style={{ color: 'white', marginBottom: '32px', fontSize: '42px' }}>{row.title}</h2>
                 <div style={{ 
-                  display: 'grid', 
-                  gridTemplateRows: 'repeat(2, 510px)', 
-                  gridAutoFlow: 'column', 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexWrap: 'wrap',
+                  height: '960px', // 450*2 + 32 (gap) + padding
                   gap: '32px', 
                   overflowX: 'auto', 
                   paddingBottom: '32px' 
