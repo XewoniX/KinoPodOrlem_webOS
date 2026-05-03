@@ -168,24 +168,6 @@ const VideoPlayerScreen = () => {
       }
   });
 
-  const ControlButton = ({ buttonRef, focused, icon, onClick, style = {} }) => (
-    <div 
-        ref={buttonRef}
-        tabIndex={0}
-        onClick={onClick}
-        className={`focusable ${focused ? 'focused' : ''}`}
-        style={{
-            width: '80px', height: '80px', borderRadius: '40px', 
-            backgroundColor: focused ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
-            display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer',
-            fontSize: '32px', color: 'white', transition: 'all 0.2s', outline: 'none',
-            ...style
-        }}
-    >
-        {icon}
-    </div>
-  );
-
   return (
     <FocusContext.Provider value={focusKey}>
     <div ref={focusKeyRef} style={{ width: '100vw', height: '100vh', backgroundColor: 'black', position: 'relative', color: 'white', overflow: 'hidden' }}>
@@ -226,6 +208,13 @@ const VideoPlayerScreen = () => {
  
        {/* Custom OSD */}
        {showOSD && !error && (
+         <>
+         {/* Top Left Logo */}
+         <div style={{ position: 'absolute', top: '48px', left: '48px', zIndex: 160, display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <img src="./logo.png" alt="Logo" style={{ width: '64px', height: '64px' }} />
+            <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'rgba(255,255,255,0.7)', letterSpacing: '1px' }}>KINO POD ORŁEM</span>
+         </div>
+
          <div style={{
            position: 'absolute', bottom: '40px', left: '50%', transform: 'translateX(-50%)', 
            width: '85%', 
@@ -259,11 +248,30 @@ const VideoPlayerScreen = () => {
                </div>
            </div>
          </div>
+         </>
        )}
     </div>
     </FocusContext.Provider>
   );
 };
+
+const ControlButton = ({ buttonRef, focused, icon, onClick, style = {} }) => (
+    <div 
+        ref={buttonRef}
+        tabIndex={0}
+        onClick={onClick}
+        className={`focusable ${focused ? 'focused' : ''}`}
+        style={{
+            width: '80px', height: '80px', borderRadius: '40px', 
+            backgroundColor: focused ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer',
+            fontSize: '32px', color: 'white', transition: 'all 0.2s', outline: 'none',
+            ...style
+        }}
+    >
+        {icon}
+    </div>
+);
 
 const ErrorOverlay = ({ error, onBack }) => {
     const { ref, focused, focusSelf } = useFocusable({
