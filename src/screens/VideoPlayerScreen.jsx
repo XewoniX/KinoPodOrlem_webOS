@@ -40,6 +40,7 @@ const VideoPlayerScreen = () => {
     if (isIntro) {
       setIsIntro(false);
       setShowOSD(false);
+      setIsPlaying(true);
     }
   }, [isIntro]);
 
@@ -207,9 +208,11 @@ const VideoPlayerScreen = () => {
       
       {/* Background Video */}
       <video 
+        key={isIntro ? 'intro' : 'main'}
         ref={videoRef}
         autoPlay
         playsInline
+        src={isIntro ? introUrl : streamUrl}
         style={{ width: '100%', height: '100%' }}
         onPlaying={() => {
             setIsPlaying(true);
@@ -236,10 +239,7 @@ const VideoPlayerScreen = () => {
             }
             setError(msg);
         }}
-      >
-          <source src={isIntro ? introUrl : streamUrl} type="video/mp4" />
-          {!isIntro && <source src={streamUrl} type="video/x-matroska" />}
-      </video>
+      />
  
        {/* Error Overlay */}
        {error && (
