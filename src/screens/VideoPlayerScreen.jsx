@@ -8,6 +8,7 @@ const VideoPlayerScreen = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const videoRef = useRef(null);
+  const hasStartedRef = useRef(false);
   
   const [isIntro, setIsIntro] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -93,6 +94,7 @@ const VideoPlayerScreen = () => {
 
   const handleReplay = useCallback(() => {
     if (videoRef.current) {
+        hasStartedRef.current = true; // Mark as started to prevent startPos override
         videoRef.current.currentTime = 0;
         videoRef.current.play();
         setIsPlaying(true);
@@ -216,8 +218,9 @@ const VideoPlayerScreen = () => {
         style={{ width: '100%', height: '100%' }}
         onPlaying={() => {
             setIsPlaying(true);
-            if (!isIntro && startPos > 0 && videoRef.current && videoRef.current.currentTime < 1) {
+            if (!isIntro && startPos > 0 && videoRef.current && videoRef.current.currentTime < 1 && !hasStartedRef.current) {
                 videoRef.current.currentTime = startPos;
+                hasStartedRef.current = true;
             }
         }}
         onEnded={() => {
@@ -288,10 +291,10 @@ const VideoPlayerScreen = () => {
   
                {/* Controls Row */}
                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '30px', marginTop: '10px' }}>
+                   <ControlButton buttonRef={replayRef} icon="🔄" focused={replayFocused} onClick={handleReplay} />
                    <ControlButton buttonRef={rewindRef} icon="⏪" focused={rewindFocused} onClick={handleRewind} />
                    <ControlButton buttonRef={playPauseRef} icon={isPlaying ? "⏸" : "▶"} focused={playPauseFocused} onClick={handlePlayPause} />
                    <ControlButton buttonRef={ffRef} icon="⏩" focused={ffFocused} onClick={handleFastForward} />
-                   <ControlButton buttonRef={replayRef} icon="🔄" focused={replayFocused} onClick={handleReplay} />
                    <ControlButton buttonRef={closeBtnRef} icon="✕" focused={closeBtnFocused} onClick={() => saveProgress().finally(() => navigate(-1))} />
                </div>
            </div>
