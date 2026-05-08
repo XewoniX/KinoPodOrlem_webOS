@@ -9,6 +9,7 @@ const VideoPlayerScreen = () => {
   const navigate = useNavigate();
   const videoRef = useRef(null);
   
+  const [isIntro, setIsIntro] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -27,9 +28,23 @@ const VideoPlayerScreen = () => {
   const encodedFolder = encodeURIComponent(folder);
   const encodedFile = encodeURIComponent(filename);
   const streamUrl = `${SERVER_URL}/stream/${encodedFolder}/${encodedFile}`;
+  const introUrl = `${SERVER_URL}/intro.mp4`;
+
+  const resetOSDTimer = useCallback(() => {
+    setShowOSD(true);
+    if (osdTimerRef.current) clearTimeout(osdTimerRef.current);
+    osdTimerRef.current = setTimeout(() => setShowOSD(false), 5000);
+  }, []);
+
+  const skipIntro = useCallback(() => {
+    if (isIntro) {
+      setIsIntro(false);
+      setShowOSD(false);
+    }
+  }, [isIntro]);
 
   const saveProgress = useCallback(async () => {
-    if (!videoRef.current || !user) return;
+    if (!videoRef.current || !user || isIntro) return;
     const pos = videoRef.current.currentTime;
     const dur = videoRef.current.duration;
     if (dur > 0) {
@@ -45,13 +60,7 @@ const VideoPlayerScreen = () => {
             console.warn('Progress save error', e);
         }
     }
-  }, [user, folder, filename]);
-
-  const toggleOSD = useCallback(() => {
-    setShowOSD(true);
-    if (osdTimerRef.current) clearTimeout(osdTimerRef.current);
-    osdTimerRef.current = setTimeout(() => setShowOSD(false), 5000);
-  }, []);
+  }, [user, folder, filename, isIntro]);
 
   const handlePlayPause = useCallback(() => {
     if (videoRef.current) {
@@ -64,21 +73,31 @@ const VideoPlayerScreen = () => {
         setShowOSD(true);
       }
     }
-  }, []);
+    resetOSDTimer();
+  }, [resetOSDTimer]);
 
   const handleRewind = useCallback(() => {
-    if (videoRef.current) {
+    if (videoRef.current && !isIntro) {
         videoRef.current.currentTime -= 30;
     }
-    toggleOSD();
-  }, [toggleOSD]);
+    resetOSDTimer();
+  }, [resetOSDTimer, isIntro]);
 
   const handleFastForward = useCallback(() => {
-    if (videoRef.current) {
+    if (videoRef.current && !isIntro) {
         videoRef.current.currentTime += 30;
     }
-    toggleOSD();
-  }, [toggleOSD]);
+    resetOSDTimer();
+  }, [resetOSDTimer, isIntro]);
+
+  const handleReplay = useCallback(() => {
+    if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play();
+        setIsPlaying(true);
+    }
+    resetOSDTimer();
+  }, [resetOSDTimer]);
 
   useEffect(() => {
     // Focus the screen/container on mount
@@ -97,14 +116,14 @@ const VideoPlayerScreen = () => {
   }, [saveProgress, focusSelf]);
 
   useEffect(() => {
-    if (showOSD) {
+    if (showOSD && !isIntro) {
         // When OSD appears, focus the central Play/Pause button
         const timer = setTimeout(() => {
             setFocus('PLAY_PAUSE_BUTTON');
         }, 100);
         return () => clearTimeout(timer);
     }
-  }, [showOSD]);
+  }, [showOSD, isIntro]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -118,24 +137,28 @@ const VideoPlayerScreen = () => {
 
       switch (e.key) {
         case 'Enter':
-          if (!showOSD) {
-              toggleOSD();
+          if (isIntro) {
+            skipIntro();
+          } else if (!showOSD) {
+            resetOSDTimer();
           }
           break;
         case 'MediaPlayPause':
-          handlePlayPause();
+          if (!isIntro) handlePlayPause();
           break;
         case 'ArrowRight':
         case 'MediaFastForward':
-          if (!showOSD) toggleOSD();
+          if (isIntro) skipIntro();
+          else if (!showOSD) resetOSDTimer();
           break;
         case 'ArrowLeft':
         case 'MediaRewind':
-          if (!showOSD) toggleOSD();
+          if (isIntro) skipIntro();
+          else if (!showOSD) resetOSDTimer();
           break;
         case 'ArrowUp':
         case 'ArrowDown':
-          if (!showOSD) toggleOSD();
+          if (!isIntro && !showOSD) resetOSDTimer();
           break;
         default:
           break;
@@ -144,28 +167,38 @@ const VideoPlayerScreen = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, saveProgress, showOSD, toggleOSD, handlePlayPause]);
+  }, [navigate, saveProgress, showOSD, resetOSDTimer, handlePlayPause, isIntro, skipIntro]);
 
   const { ref: rewindRef, focused: rewindFocused } = useFocusable({
     focusKey: 'REWIND_BUTTON',
-    onEnterPress: handleRewind
+    onEnterPress: handleRewind,
+    onFocus: resetOSDTimer
   });
 
   const { ref: playPauseRef, focused: playPauseFocused } = useFocusable({
     focusKey: 'PLAY_PAUSE_BUTTON',
-    onEnterPress: handlePlayPause
+    onEnterPress: handlePlayPause,
+    onFocus: resetOSDTimer
   });
 
   const { ref: ffRef, focused: ffFocused } = useFocusable({
     focusKey: 'FF_BUTTON',
-    onEnterPress: handleFastForward
+    onEnterPress: handleFastForward,
+    onFocus: resetOSDTimer
+  });
+
+  const { ref: replayRef, focused: replayFocused } = useFocusable({
+    focusKey: 'REPLAY_BUTTON',
+    onEnterPress: handleReplay,
+    onFocus: resetOSDTimer
   });
 
   const { ref: closeBtnRef, focused: closeBtnFocused } = useFocusable({
       focusKey: 'CLOSE_BUTTON',
       onEnterPress: () => {
           saveProgress().finally(() => navigate(-1));
-      }
+      },
+      onFocus: resetOSDTimer
   });
 
   return (
@@ -180,8 +213,15 @@ const VideoPlayerScreen = () => {
         style={{ width: '100%', height: '100%' }}
         onPlaying={() => {
             setIsPlaying(true);
-            if (startPos > 0 && videoRef.current && videoRef.current.currentTime < 1) {
+            if (!isIntro && startPos > 0 && videoRef.current && videoRef.current.currentTime < 1) {
                 videoRef.current.currentTime = startPos;
+            }
+        }}
+        onEnded={() => {
+            if (isIntro) {
+                skipIntro();
+            } else {
+                saveProgress().finally(() => navigate(-1));
             }
         }}
         onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
@@ -197,17 +237,24 @@ const VideoPlayerScreen = () => {
             setError(msg);
         }}
       >
-          <source src={streamUrl} type="video/mp4" />
-          <source src={streamUrl} type="video/x-matroska" />
+          <source src={isIntro ? introUrl : streamUrl} type="video/mp4" />
+          {!isIntro && <source src={streamUrl} type="video/x-matroska" />}
       </video>
  
        {/* Error Overlay */}
        {error && (
          <ErrorOverlay error={error} onBack={() => navigate(-1)} />
        )}
+
+       {/* Intro Skip Hint */}
+       {isIntro && (
+         <div style={{ position: 'absolute', bottom: '48px', right: '48px', backgroundColor: 'rgba(0,0,0,0.6)', padding: '16px 32px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.2)', zIndex: 100 }}>
+            <span style={{ fontSize: '24px', fontWeight: 'bold' }}>Naciśnij OK, aby pominąć intro</span>
+         </div>
+       )}
  
        {/* Custom OSD */}
-       {showOSD && !error && (
+       {showOSD && !error && !isIntro && (
          <>
          {/* Top Left Logo */}
          <div style={{ position: 'absolute', top: '48px', left: '48px', zIndex: 160, display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -238,12 +285,13 @@ const VideoPlayerScreen = () => {
                        {Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, '0')}
                    </span>
                </div>
- 
+  
                {/* Controls Row */}
-               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '50px', marginTop: '10px' }}>
+               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '30px', marginTop: '10px' }}>
                    <ControlButton buttonRef={rewindRef} icon="⏪" focused={rewindFocused} onClick={handleRewind} />
                    <ControlButton buttonRef={playPauseRef} icon={isPlaying ? "⏸" : "▶"} focused={playPauseFocused} onClick={handlePlayPause} />
                    <ControlButton buttonRef={ffRef} icon="⏩" focused={ffFocused} onClick={handleFastForward} />
+                   <ControlButton buttonRef={replayRef} icon="🔄" focused={replayFocused} onClick={handleReplay} />
                    <ControlButton buttonRef={closeBtnRef} icon="✕" focused={closeBtnFocused} onClick={() => saveProgress().finally(() => navigate(-1))} />
                </div>
            </div>
