@@ -16,7 +16,13 @@ const VideoPlayerScreen = () => {
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(null);
   const [showOSD, setShowOSD] = useState(true);
+  const [episodeIntro, setEpisodeIntro] = useState(null);
+  const [showSkipSeriesIntro, setShowSkipSeriesIntro] = useState(false);
   const osdTimerRef = useRef(null);
+  const hasAutoSkippedRef = useRef(false);
+
+  const autoSkipSeries = localStorage.getItem('orlekino_auto_skip_series_intro') === 'true';
+  const skipPlatformIntro = localStorage.getItem('orlekino_auto_skip_platform_intro') === 'true';
 
   const { ref: focusKeyRef, focusKey, focusSelf } = useFocusable();
 
@@ -31,6 +37,13 @@ const VideoPlayerScreen = () => {
   const streamUrl = `${SERVER_URL}/stream/${encodedFolder}/${encodedFile}`;
   const introUrl = `${SERVER_URL}/intro.mp4`;
 
+  useEffect(() => {
+    if (skipPlatformIntro && isIntro) {
+        setIsIntro(false);
+        setShowOSD(false);
+    }
+  }, [skipPlatformIntro, isIntro]);
+
   const resetOSDTimer = useCallback(() => {
     setShowOSD(true);
     if (osdTimerRef.current) clearTimeout(osdTimerRef.current);
@@ -44,6 +57,14 @@ const VideoPlayerScreen = () => {
       setIsPlaying(true);
     }
   }, [isIntro]);
+
+  const skipSeriesIntro = useCallback(() => {
+    if (videoRef.current && episodeIntro) {
+        videoRef.current.currentTime = episodeIntro.intro_end - 5;
+        setShowSkipSeriesIntro(false);
+        resetOSDTimer();
+    }
+  }, [episodeIntro, resetOSDTimer]);
 
   const saveProgress = useCallback(async () => {
     if (!videoRef.current || !user || isIntro) return;
@@ -103,6 +124,34 @@ const VideoPlayerScreen = () => {
   }, [resetOSDTimer]);
 
   useEffect(() => {
+    const fetchIntro = async () => {
+      try {
+        const resp = await axios.get(`${SERVER_URL}/stream/${encodedFolder}/intro_data.json`);
+        if (resp.data && resp.data[filename]) {
+          setEpisodeIntro(resp.data[filename]);
+        }
+      } catch (e) {}
+    };
+    if (folder) fetchIntro();
+  }, [folder, filename, encodedFolder]);
+
+  useEffect(() => {
+    if (episodeIntro && !isIntro) {
+        const start = episodeIntro.intro_start - 5;
+        const end = episodeIntro.intro_end;
+        const inRange = currentTime >= start && currentTime <= end;
+        
+        if (autoSkipSeries && inRange && !hasAutoSkippedRef.current) {
+            hasAutoSkippedRef.current = true;
+            videoRef.current.currentTime = end - 5;
+            setShowSkipSeriesIntro(false);
+        } else {
+            setShowSkipSeriesIntro(inRange);
+        }
+    }
+  }, [currentTime, episodeIntro, isIntro, autoSkipSeries]);
+
+  useEffect(() => {
     // Focus the screen/container on mount
     focusSelf();
     
@@ -125,8 +174,13 @@ const VideoPlayerScreen = () => {
             setFocus('PLAY_PAUSE_BUTTON');
         }, 100);
         return () => clearTimeout(timer);
+    } else if (showSkipSeriesIntro && !showOSD) {
+        const timer = setTimeout(() => {
+            setFocus('SKIP_SERIES_BUTTON');
+        }, 100);
+        return () => clearTimeout(timer);
     }
-  }, [showOSD, isIntro]);
+  }, [showOSD, isIntro, showSkipSeriesIntro]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -142,6 +196,8 @@ const VideoPlayerScreen = () => {
         case 'Enter':
           if (isIntro) {
             skipIntro();
+          } else if (showSkipSeriesIntro) {
+            skipSeriesIntro();
           } else if (!showOSD) {
             resetOSDTimer();
           }
@@ -204,6 +260,12 @@ const VideoPlayerScreen = () => {
       onFocus: resetOSDTimer
   });
 
+  const { ref: skipSeriesRef, focused: skipSeriesFocused } = useFocusable({
+    focusKey: 'SKIP_SERIES_BUTTON',
+    onEnterPress: skipSeriesIntro,
+    onFocus: resetOSDTimer
+  });
+
   return (
     <FocusContext.Provider value={focusKey}>
     <div ref={focusKeyRef} style={{ width: '100vw', height: '100vh', backgroundColor: 'black', position: 'relative', color: 'white', overflow: 'hidden' }}>
@@ -249,12 +311,30 @@ const VideoPlayerScreen = () => {
          <ErrorOverlay error={error} onBack={() => navigate(-1)} />
        )}
 
-       {/* Intro Skip Hint */}
-       {isIntro && (
-         <div style={{ position: 'absolute', bottom: '48px', right: '48px', backgroundColor: 'rgba(0,0,0,0.6)', padding: '16px 32px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.2)', zIndex: 100 }}>
-            <span style={{ fontSize: '24px', fontWeight: 'bold' }}>Naciśnij OK, aby pominąć intro</span>
-         </div>
-       )}
+        {/* Intro Skip Hint */}
+        {isIntro && (
+          <div style={{ position: 'absolute', bottom: '48px', right: '48px', backgroundColor: 'rgba(0,0,0,0.6)', padding: '16px 32px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.2)', zIndex: 100 }}>
+             <span style={{ fontSize: '24px', fontWeight: 'bold' }}>Naciśnij OK, aby pominąć intro</span>
+          </div>
+        )}
+
+        {showSkipSeriesIntro && !isIntro && !error && (
+            <div 
+                ref={skipSeriesRef}
+                onClick={skipSeriesIntro}
+                className={`focusable ${skipSeriesFocused ? 'focused' : ''}`}
+                style={{ 
+                    position: 'absolute', bottom: '48px', right: '48px', 
+                    backgroundColor: skipSeriesFocused ? 'var(--primary)' : 'rgba(0,0,0,0.6)', 
+                    padding: '16px 32px', borderRadius: '12px', 
+                    border: '1px solid rgba(255,255,255,0.2)', zIndex: 170,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px',
+                    transition: 'all 0.2s'
+                }}
+            >
+                <span style={{ fontSize: '20px', fontWeight: 'bold' }}>⏭ POMIŃ INTRO</span>
+            </div>
+        )}
  
        {/* Custom OSD */}
        {showOSD && !error && !isIntro && (
